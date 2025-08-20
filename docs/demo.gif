@@ -1,0 +1,62 @@
+AgroPi Demo Storyboard
+1. Opening
+
+AgroPi logo and dashboard overview
+
+2. Live Sensor Cards
+
+Display:
+
+EC: 1.8
+
+pH: 6.0
+
+Temperature: 29°C (yellow warning)
+
+Humidity: 62%
+
+Light: 400
+
+CO2: 800
+
+3. Leaf Photo Upload
+
+Action:
+
+User clicks "Upload leaf photo"
+
+AI returns: "Downy mildew risk: Medium — Increase airflow; adjust EC to 1.6."
+
+4. Apply Automation
+
+Action:
+
+User taps "Apply"
+
+Relays trigger pumps for 2 minutes
+
+Action log appears: "Irrigation started"
+
+5. Buy with Pi
+
+Action:
+
+User taps "Buy with Pi"
+
+Pi Wallet payment approval screen
+
+Premium recipe unlocks
+
+6. IPFS Upload & Share
+
+Action:
+
+Upload run summary to IPFS
+
+Display content hash
+
+Show "Share with cooperative" button
+
+7. Closing
+
+Thank you for using AgroPi!

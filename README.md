@@ -1,7 +1,7 @@
 <p align="center">
   <img src="docs/logo.png" alt="AgroPi Logo" width="180"/>
-  
-</p># AgroPi v2
+  </p>
+  # AgroPi v2
 
 AI-powered smart farming and Pi-commerce platform.
 

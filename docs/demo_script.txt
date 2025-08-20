@@ -1,0 +1,5 @@
+0–10s: Open dashboard; live sensor cards show EC, pH, temp 29°C (yellow warning), humidity 62%.
+10–20s: Upload a leaf image; AI returns “Downy mildew risk: Medium — Increase airflow; adjust EC to 1.6.”
+20–30s: Tap “Apply”; relays trigger pumps for 2 minutes; show action log.
+30–45s: Tap “Buy with Pi”; approve in Pi Wallet; premium recipe unlocks.
+45–60s: Upload run summary to IPFS; display content hash and “Share with cooperative” CTA.

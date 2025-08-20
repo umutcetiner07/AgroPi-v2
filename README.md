@@ -1,4 +1,7 @@
-# AgroPi v2
+<p align="center">
+  <img src="docs/logo.png" alt="AgroPi Logo" width="180"/>
+</p># AgroPi v2
+
 AI-powered smart farming and Pi-commerce platform.
 
 AgroPi provides real-time monitoring with sensors, AI-based disease detection, and automation for irrigation/fertilization. With Pi Wallet micro-payments, growers can purchase premium nutrient recipes, on-demand consulting, and data-driven recommendations using Pi. IPFS ensures transparent data sharing.

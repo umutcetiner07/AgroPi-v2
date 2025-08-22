@@ -53,59 +53,16 @@
     </div>
   </div>
 
- <!-- Pi SDK -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script>
-  // Pi SDK başlatma
-  try {
-    Pi.init({ version: "2.0", sandbox: false });
-  } catch (e) {
-    console.warn("Pi SDK init warning:", e?.message || e);
-  }
-
-  // Eksik kalmış ödemeleri yakalamak için callback (opsiyonel)
-  function onIncompletePaymentFound(payment) {
-    console.log("Incomplete payment found:", payment);
-  }
-
-  async function payWithPi() {
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    // Pi SDK init
     try {
-      // 1) Gerekli izinlerle (payments) giriş yap
-      const scopes = ["payments"]; // gerekirse 'username' da eklenebilir
-      const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-      console.log("Authenticated:", auth);
-
-      // 2) Ödeme oluştur
-      const paymentData = {
-        amount: 0.01,
-        memo: "AgroPi setup check",
-        metadata: { purpose: "setup-check" }
-      };
-
-      const callbacks = {
-        onReadyForServerApproval(paymentId) {
-          console.log("onReadyForServerApproval", paymentId);
-          alert("Payment created. Waiting for server approval…");
-          // Backend yoksa burada bekler; birazdan mini backend ekleyebiliriz.
-        },
-        onReadyForServerCompletion(paymentId, txid) {
-          console.log("onReadyForServerCompletion", paymentId, txid);
-          alert("Payment complete! txid: " + txid);
-        },
-        onCancel(paymentId) {
-          console.log("onCancel", paymentId);
-          alert("Payment canceled.");
-        },
-        onError(error, paymentId) {
-          console.error("onError", error, paymentId);
-          alert("Payment error: " + (error?.message || "Unknown error"));
-        }
-      };
-
-      await Pi.createPayment(paymentData, callbacks);
+      Pi.init({ version: "2.0", sandbox: false });
     } catch (e) {
-      console.error(e);
-      alert("Init error: " + (e?.message || e));
+      console.warn("Pi SDK init warning:", e?.message || e);
     }
-  }
-</script>
+
+    function onIncompletePaymentFound(payment) {
+      console.log("Incomplete payment found:", payment);
+    }

@@ -62,8 +62,9 @@
   </div>
 
   <script>
-  // ---------- Ayarlar ----------
-  const PI_APP_ID = ""; // App ID varsa buraya yaz. Şimdilik test için boş.
+  // ---------- AYARLAR ----------
+  // Ben slug'ı koydum. Eğer hata alırsan PI_APP_ID değerini "agropi8308" gibi subdomain ile de dene.
+  const PI_APP_ID = "agropi-e19dcb997017c03d";
   const PI_SDK_URL = "https://sdk.minepi.com/pi-sdk.js";
   // ------------------------------
 
@@ -106,15 +107,23 @@
   let piUser = null;
   let piAccessToken = null;
 
+  // Timeout destekli login (popup gelmezse 20s sonra timeout atar)
   async function piLogin(){
     try{
       setStatus("Giriş başlatılıyor...", "warn");
       const Pi = await initPi();
       const scopes = ["payments","username","wallet_address"];
       log("authenticate çağrılıyor. appId: " + (PI_APP_ID || "(yok)"));
-      const authRes = PI_APP_ID
-        ? await Pi.authenticate(scopes, onIncompletePaymentFound, { appId: PI_APP_ID })
-        : await Pi.authenticate(scopes, onIncompletePaymentFound);
+
+      const authPromise = PI_APP_ID
+        ? Pi.authenticate(scopes, onIncompletePaymentFound, { appId: PI_APP_ID })
+        : Pi.authenticate(scopes, onIncompletePaymentFound);
+
+      const authRes = await Promise.race([
+        authPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("authenticate timeout (20s) — popup gelmedi veya engellendi)")), 20000))
+      ]);
+
       piUser = authRes.user;
       piAccessToken = authRes.accessToken;
       $("#userBox").textContent = `${piUser?.username || "—"} (${piUser?.wallet?.address || "—"})`;
@@ -139,7 +148,7 @@
 
   async function onIncompletePaymentFound(payment){
     log("Eksik ödeme bulundu: " + JSON.stringify(payment));
-    // backend yoksa burada bir şey yapma; prod için approve/complete uçları gerekir.
+    // prod için backend approve/complete gerekecek
   }
 
   async function startPayment(){
@@ -168,7 +177,6 @@
       const payment = await Pi.createPayment({ amount, memo, metadata }, {
         onReadyForServerApproval: async (paymentId) => {
           log("onReadyForServerApproval: " + paymentId);
-          // Prod: burada backend'e /approve çağrısı yap.
         },
         onReadyForServerCompletion: async (paymentId, txid) => {
           log("onReadyForServerCompletion: " + paymentId + " txid:" + (txid||"—"));
@@ -187,7 +195,6 @@
     }catch(err){
       log("createPayment hata (try/catch): " + (err?.message || JSON.stringify(err)));
       setStatus("Ödeme başlatılamadı: " + (err?.message || err), "warn");
-      // Önemli: burada hata mesajı genelde "Origin not allowed" veya "Invalid app id" gibi olur.
     }
   }
 
@@ -195,6 +202,18 @@
   $("#loginBtn").addEventListener("click", piLogin);
   $("#logoutBtn").addEventListener("click", piLogout);
   $("#payBtn").addEventListener("click", startPayment);
+
+  // Debug auto-init (sayfa açıldığında SDK yüklemeyi deneyip loglar)
+  (async () => {
+    try{
+      log("DEBUG: Sayfa yüklendi, Pi SDK yüklenecek...");
+      const Pi = await ensurePiSdk();
+      try { Pi.init({ version: "2.0", sandbox: true }); log("DEBUG: Pi.init OK"); }
+      catch(e){ log("DEBUG: Pi.init hata: " + (e?.message || e)); }
+    }catch(e){
+      log("DEBUG: ensurePiSdk hata: " + (e?.message || e));
+    }
+  })();
 
   // Başlangıç bilgisi
   log("Sayfa yüklendi. Pi Browser kullanın ve önce 'Pi ile Giriş' deneyin.");

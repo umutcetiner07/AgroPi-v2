@@ -1,499 +1,263 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AgroPi — Çiftçi Platformu</title>
-  <meta name="description" content="AgroPi: Pi Network ile tarımda sözleşmeli üretim, ödeme ve izlenebilirlik." />
-  <meta name="theme-color" content="#0f766e" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: #12182b;
-      --muted: #a6b0cf;
-      --text: #e9edf7;
-      --brand: #22c55e;
-      --brand-2: #14b8a6;
-      --warn: #f59e0b;
-      --danger: #ef4444;
-      --ok: #22c55e;
-      --border: #223055;
-      --shadow: 0 8px 30px rgba(0,0,0,.25);
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 10% 0%, #0d1530 0%, var(--bg) 60%);
-      color: var(--text);
-    }
-    a { color: var(--brand-2); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .container {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 8px 0 24px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .brand img {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-    .brand h1 {
-      font-size: 20px;
-      margin: 0;
-      letter-spacing: 0.2px;
-    }
-    nav {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .btn, button {
-      appearance: none;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #1a2440, #12182b);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: var(--shadow);
-      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-    }
-    .btn:hover, button:hover { transform: translateY(-1px); border-color: #2d3e73; }
-    .btn:active, button:active { transform: translateY(0px) scale(.99); }
-    .btn.primary {
-      background: linear-gradient(180deg, #22c55e, #16a34a);
-      color: #07120b;
-      border: 1px solid #0e7a3b;
-    }
-    .btn.warn { background: linear-gradient(180deg, #f59e0b, #d97706); border-color: #a16207; color: #1b1204; }
-    .btn.danger { background: linear-gradient(180deg, #ef4444, #dc2626); border-color: #991b1b; }
-    .grid {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 20px;
-    }
-    @media (max-width: 920px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-    .card {
-      background: linear-gradient(180deg, #12182b, #0e1426);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-    .muted { color: var(--muted); }
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 12px 0;
-    }
-    .row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .field {
-      display: grid;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-    .field label { font-size: 13px; color: var(--muted); }
-    .input, select, textarea {
-      width: 100%;
-      background: #0b1328;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      outline: none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-    .input:focus, select:focus, textarea:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,.2);
-    }
-    .badges { display: flex; flex-wrap: wrap; gap: 8px; }
-    .badge {
-      font-size: 12px;
-      background: #0a1b3a;
-      color: #c6d0f0;
-      padding: 6px 10px;
-      border: 1px solid #1c2d59;
-      border-radius: 999px;
-    }
-    .status {
-      padding: 10px 12px;
-      font-size: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0b1328;
-      white-space: pre-line;
-    }
-    .status.ok { border-color: rgba(34,197,94,.5); }
-    .status.warn { border-color: rgba(245,158,11,.5); }
-    .status.err { border-color: rgba(239,68,68,.5); }
-    footer {
-      margin-top: 28px;
-      padding: 16px 0 32px;
-      color: var(--muted);
-      font-size: 13px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .small { font-size: 12px; color: var(--muted); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .spacer { height: 8px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="brand">
-        <img src="AgroPi Logo.png" alt="AgroPi" />
-        <h1>AgroPi <span class="small">— Pi ile Tarım</span></h1>
-      </div>
-      <nav>
-        <button id="loginBtn" class="btn">Pi ile Giriş</button>
-        <button id="logoutBtn" class="btn" style="display:none;">Çıkış</button>
-      </nav>
-    </header>
+<script>
+/*
+  AgroPi - temiz JS bloğu (sandbox/testnet, appId opsiyonel)
+  Yapılacak: mevcut <script>...</script> bloğunu tamamen silip
+  bununla değiştir. Önce dosyanın yedeğini al.
+*/
 
-    <div class="grid">
-      <section class="card">
-        <h2 class="section-title">Çiftçi Kayıt ve Sipariş</h2>
-        <p class="muted">AgroPi; sözleşmeli üretim, izlenebilirlik ve güvenli ödemeyi Pi Network ile birleştirir.</p>
+const $ = (sel) => document.querySelector(sel);
+const log = (msg) => {
+  const box = $("#logBox");
+  const prefix = "[" + new Date().toLocaleTimeString() + "] ";
+  if (box) {
+    box.textContent = (box.textContent === "—" ? "" : box.textContent + "\n") + prefix + msg;
+    box.scrollTop = box.scrollHeight;
+  } else {
+    console.log(prefix + msg);
+  }
+};
+const setStatus = (txt, type="") => {
+  const el = $("#status");
+  if (el) {
+    el.textContent = txt;
+    el.className = "status " + (type || "");
+  } else {
+    log("STATUS: " + txt);
+  }
+};
+const summarizeCart = () => {
+  const name = $("#name")?.value?.trim();
+  const product = $("#product")?.value;
+  const quantity = Number($("#quantity")?.value || 0);
+  const price = Number($("#price")?.value || 0);
+  if (!product || !quantity || !price) return "Boş";
+  const total = (quantity * price).toFixed(4);
+  return `${name || "—"}: ${product} x ${quantity} kg @ ${price} Pi = ${total} Pi`;
+};
 
-        <div class="badges" style="margin:10px 0 16px;">
-          <span class="badge">Ödeme: Pi</span>
-          <span class="badge">Akıllı Sözleşme</span>
-          <span class="badge">IoT Sensör Entegrasyonu</span>
-          <span class="badge">KYC Uyumlu</span>
-        </div>
+// Yıl
+if ($("#y")) $("#y").textContent = new Date().getFullYear();
 
-        <form id="farmerForm">
-          <div class="row">
-            <div class="field" style="flex:1;">
-              <label for="name">Ad Soyad</label>
-              <input id="name" class="input" required placeholder="Örn. Ali Yılmaz" />
-            </div>
-            <div class="field" style="flex:1;">
-              <label for="phone">Telefon</label>
-              <input id="phone" class="input" required placeholder="+90 5xx xxx xx xx" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field" style="flex:1;">
-              <label for="region">Bölge</label>
-              <select id="region" required>
-                <option value="">Seçiniz</option>
-                <option>Akdeniz</option>
-                <option>Ege</option>
-                <option>Marmara</option>
-                <option>İç Anadolu</option>
-                <option>Karadeniz</option>
-                <option>Doğu Anadolu</option>
-                <option>Güneydoğu Anadolu</option>
-              </select>
-            </div>
-            <div class="field" style="flex:1;">
-              <label for="product">Ürün</label>
-              <select id="product" required>
-                <option value="">Seçiniz</option>
-                <option>Buğday</option>
-                <option>Mısır</option>
-                <option>Ayçiçeği</option>
-                <option>Domates</option>
-                <option>Biber</option>
-                <option>Patates</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field" style="flex:1;">
-              <label for="quantity">Miktar (kg)</label>
-              <input id="quantity" class="input" type="number" min="1" step="1" placeholder="Örn. 1000" required />
-            </div>
-            <div class="field" style="flex:1;">
-              <label for="price">Birim Fiyat (Pi)</label>
-              <input id="price" class="input" type="number" min="0" step="0.0001" placeholder="Örn. 0.25" required />
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="notes">Notlar</label>
-            <textarea id="notes" rows="3" placeholder="Teslimat tarihi, kalite, sözleşme koşulları..."></textarea>
-          </div>
-
-          <div class="row">
-            <button type="submit" class="btn primary">Kaydı Oluştur</button>
-            <button type="button" id="payBtn" class="btn warn">Pi ile Öde</button>
-            <button type="button" id="clearBtn" class="btn">Temizle</button>
-          </div>
-        </form>
-
-        <div class="spacer"></div>
-        <div id="status" class="status">Durum: Hazır</div>
-      </section>
-
-      <aside class="card">
-        <h3 class="section-title">Oturum ve Sipariş Özeti</h3>
-        <div class="field">
-          <label>Pi Kullanıcısı</label>
-          <div id="userBox" class="status warn">Giriş yapılmadı</div>
-        </div>
-        <div class="field">
-          <label>Sepet</label>
-          <div id="cartBox" class="status">Boş</div>
-        </div>
-        <div class="field">
-          <label>Log</label>
-          <div id="logBox" class="status mono" style="max-height:220px; overflow:auto;">—</div>
-        </div>
-      </aside>
-    </div>
-
-    <footer>
-      <div>© <span id="y"></span> AgroPi</div>
-      <div>
-        <a href="README.md">README</a> •
-        <a href="docs/">Docs</a> •
-        <a href="https://pi.app" target="_blank" rel="noopener">Pi Network</a>
-      </div>
-    </footer>
-  </div>
-
-  <script>
-    const $ = (sel) => document.querySelector(sel);
-    const log = (msg) => {
-      const box = $("#logBox");
-      box.textContent = (box.textContent === "—" ? "" : box.textContent + "\n") + "[" + new Date().toLocaleTimeString() + "] " + msg;
-      box.scrollTop = box.scrollHeight;
+// Form submit / kayıt
+const farmerForm = $("#farmerForm");
+if (farmerForm) {
+  farmerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const payload = {
+      name: $("#name")?.value.trim(),
+      phone: $("#phone")?.value.trim(),
+      region: $("#region")?.value,
+      product: $("#product")?.value,
+      quantity: Number($("#quantity")?.value),
+      price: Number($("#price")?.value),
+      notes: $("#notes")?.value.trim(),
     };
-    const setStatus = (txt, type="") => {
-      const el = $("#status");
-      el.textContent = txt;
-      el.className = "status " + (type || "");
-    };
-    const summarizeCart = () => {
-      const name = $("#name").value?.trim();
-      const product = $("#product").value;
-      const quantity = Number($("#quantity").value || 0);
-      const price = Number($("#price").value || 0);
-      if (!product || !quantity || !price) return "Boş";
-      const total = (quantity * price).toFixed(4);
-      return `${name || "—"}: ${product} x ${quantity} kg @ ${price} Pi = ${total} Pi`;
-    };
-
-    $("#y").textContent = new Date().getFullYear();
-
-    $("#farmerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const payload = {
-        name: $("#name").value.trim(),
-        phone: $("#phone").value.trim(),
-        region: $("#region").value,
-        product: $("#product").value,
-        quantity: Number($("#quantity").value),
-        price: Number($("#price").value),
-        notes: $("#notes").value.trim(),
-      };
-      if (!payload.name || !payload.phone || !payload.region || !payload.product || !payload.quantity || !payload.price) {
-        setStatus("Lütfen gerekli alanları doldurun.", "warn");
-        return;
-      }
-      $("#cartBox").textContent = summarizeCart();
-      setStatus("Kayıt gönderiliyor...", "warn");
-      log("Kayıt API çağrısı başlıyor.");
-
-      try {
-        const res = await fetch("/api/farmers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error("Kayıt başarısız: " + res.status);
-        const data = await res.json().catch(()=> ({}));
-        setStatus("Kayıt alındı. ID: " + (data.id || "—"), "ok");
-        log("Kayıt başarılı. ID: " + (data.id || "—"));
-      } catch (err) {
-        console.error(err);
-        setStatus("Kayıt hatası: " + err.message, "err");
-        log("Kayıt hatası: " + err.message);
-      }
-    });
-
-    $("#clearBtn").addEventListener("click", () => {
-      $("#farmerForm").reset();
-      $("#cartBox").textContent = "Boş";
-      setStatus("Form sıfırlandı.");
-      log("Form temizlendi.");
-    });
-
-    const PI_APP_ID = "TODO_APP_ID"; 
-    const PI_SDK_URL = "https://sdk.minepi.com/pi-sdk.js";
-    let piUser = null;
-    let piAccessToken = null;
-
-    function ensurePiSdk() {
-      return new Promise((resolve, reject) => {
-        if (window.Pi) return resolve(window.Pi);
-        const s = document.createElement("script");
-        s.src = PI_SDK_URL;
-        s.async = true;
-        s.onload = () => resolve(window.Pi);
-        s.onerror = () => reject(new Error("Pi SDK yüklenemedi"));
-        document.head.appendChild(s);
+    if (!payload.name || !payload.phone || !payload.region || !payload.product || !payload.quantity || !payload.price) {
+      setStatus("Lütfen gerekli alanları doldurun.", "warn");
+      return;
+    }
+    if ($("#cartBox")) $("#cartBox").textContent = summarizeCart();
+    setStatus("Kayıt gönderiliyor...", "warn");
+    log("Kayıt API çağrısı başlıyor.");
+    try {
+      // TODO: üretimde kendi backend URL'ini koy
+      const res = await fetch("/api/farmers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
+      if (!res.ok) throw new Error("Kayıt başarısız: " + res.status);
+      const data = await res.json().catch(()=> ({}));
+      setStatus("Kayıt alındı. ID: " + (data.id || "—"), "ok");
+      log("Kayıt başarılı. ID: " + (data.id || "—"));
+    } catch (err) {
+      console.error(err);
+      setStatus("Kayıt hatası: " + err.message, "err");
+      log("Kayıt hatası: " + err.message);
     }
+  });
+}
 
-    async function initPi() {
-      const Pi = await ensurePiSdk();
-      try {
-        Pi.init({ version: "2.0" });
-        log("Pi SDK init edildi.");
-        return Pi;
-      } catch (e) {
-        log("Pi init hatası: " + e.message);
-        throw e;
+// Temizle butonu
+if ($("#clearBtn")) {
+  $("#clearBtn").addEventListener("click", () => {
+    $("#farmerForm")?.reset();
+    if ($("#cartBox")) $("#cartBox").textContent = "Boş";
+    setStatus("Form sıfırlandı.");
+    log("Form temizlendi.");
+  });
+}
+
+/* ------------- Pi SDK bölüm (temiz, sandbox/testnet, appId opsiyonel) ------------- */
+
+const PI_APP_ID = ""; // Eğer App ID'yi bulduğunda buraya yazabilirsin. Şimdilik boş bırak.
+const PI_SDK_URL = "https://sdk.minepi.com/pi-sdk.js";
+let piUser = null;
+let piAccessToken = null;
+
+function ensurePiSdk() {
+  return new Promise((resolve, reject) => {
+    if (window.Pi) return resolve(window.Pi);
+    const s = document.createElement("script");
+    s.src = PI_SDK_URL;
+    s.async = true;
+    s.onload = () => {
+      if (window.Pi) {
+        resolve(window.Pi);
+      } else {
+        reject(new Error("Pi SDK yüklendi ama window.Pi bulunamadı"));
       }
-    }
+    };
+    s.onerror = () => reject(new Error("Pi SDK yüklenemedi"));
+    document.head.appendChild(s);
+  });
+}
 
-    async function piLogin() {
-      const Pi = await initPi();
-      try {
-        const scopes = ["payments","username","wallet_address"];
-        const authRes = await Pi.authenticate(scopes, onIncompletePaymentFound, { appId: PI_APP_ID });
-        piUser = authRes.user;
-        piAccessToken = authRes.accessToken;
-        $("#userBox").textContent = `${piUser?.username || "—"} (wallet: ${piUser?.wallet?.address || "—"})`;
-        $("#loginBtn").style.display = "none";
-        $("#logoutBtn").style.display = "inline-block";
-        setStatus("Pi oturumu açıldı.", "ok");
-        log("Auth başarılı. Username: " + (piUser?.username || "—"));
-        await fetch("/api/pi/verify-token", {
+async function initPi() {
+  const Pi = await ensurePiSdk();
+  try {
+    // TEST için sandbox:true. Prod'ta bunu false veya kaldır.
+    Pi.init({ version: "2.0", sandbox: true });
+    log("Pi SDK init edildi (sandbox:true).");
+    return Pi;
+  } catch (e) {
+    log("Pi init hatası: " + (e?.message || e));
+    throw e;
+  }
+}
+
+async function piLogin() {
+  try {
+    const Pi = await initPi();
+    const scopes = ["payments","username","wallet_address"];
+    log("authenticate çağrılacak. appId: " + (PI_APP_ID || "(yok)"));
+    let authRes;
+    if (PI_APP_ID) {
+      authRes = await Pi.authenticate(scopes, onIncompletePaymentFound, { appId: PI_APP_ID });
+    } else {
+      // appId opsiyonel deneyimi
+      authRes = await Pi.authenticate(scopes, onIncompletePaymentFound);
+    }
+    piUser = authRes.user;
+    piAccessToken = authRes.accessToken;
+    $("#userBox").textContent = `${piUser?.username || "—"} (wallet: ${piUser?.wallet?.address || "—"})`;
+    $("#loginBtn").style.display = "none";
+    $("#logoutBtn").style.display = "inline-block";
+    setStatus("Pi oturumu açıldı.", "ok");
+    log("Auth başarılı. Username: " + (piUser?.username || "—"));
+    // Backend'e token doğrulama isteği (isteğe bağlı)
+    fetch("/api/pi/verify-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken: piAccessToken })
+    }).catch(()=>{ log("verify-token isteği atıldı (catch)."); });
+  } catch (err) {
+    setStatus("Giriş iptal/başarısız: " + (err?.message || err), "warn");
+    log("Auth hata/iptal: " + ((err && err.message) || err));
+    console.error(err);
+  }
+}
+
+async function piLogout() {
+  piUser = null;
+  piAccessToken = null;
+  if ($("#userBox")) $("#userBox").textContent = "Giriş yapılmadı";
+  $("#loginBtn").style.display = "inline-block";
+  $("#logoutBtn").style.display = "none";
+  setStatus("Oturum kapatıldı.");
+  log("Oturum kapatıldı.");
+}
+
+// Eksik ödeme kontrol callback'i
+async function onIncompletePaymentFound(payment) {
+  log("Eksik ödeme bulundu: " + (payment?.identifier || JSON.stringify(payment)));
+  try {
+    await fetch("/api/pi/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payment })
+    }).catch(()=>{ log("complete çağrısı gönderildi, hata yutuldu."); });
+    log("Eksik ödeme bildirildi backend'e.");
+  } catch (e) {
+    log("Eksik ödeme notify hatası: " + (e?.message || e));
+  }
+}
+
+async function startPayment() {
+  const product = $("#product")?.value;
+  const quantity = Number($("#quantity")?.value);
+  const price = Number($("#price")?.value);
+  if (!piUser) {
+    setStatus("Önce Pi ile giriş yapın.", "warn");
+    log("startPayment: piUser yok");
+    return;
+  }
+  if (!product || !quantity || !price) {
+    setStatus("Ürün/Miktar/Fiyat eksik.", "warn");
+    log("startPayment: eksik alan (product/quantity/price)");
+    return;
+  }
+  const amount = Number((quantity * price).toFixed(6));
+  const memo = `AgroPi sipariş: ${product} x ${quantity}kg`;
+  const metadata = { product, quantity, unit_price: price };
+
+  setStatus("Ödeme başlatılıyor...", "warn");
+  log(`Ödeme isteği: ${amount} Pi - ${memo} | metadata: ${JSON.stringify(metadata)}`);
+
+  try {
+    const Pi = await initPi();
+    const paymentData = { amount, memo, metadata };
+    log("createPayment çağrılıyor. paymentData=" + JSON.stringify(paymentData));
+
+    const payment = await Pi.createPayment(paymentData, {
+      onReadyForServerApproval: async (paymentId) => {
+        log("onReadyForServerApproval: " + paymentId);
+        // backend yoksa bu fetch 404 dönebilir; hata yutuluyor.
+        await fetch("/api/pi/approve", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accessToken: piAccessToken })
-        }).catch(()=>{});
-      } catch (err) {
-        setStatus("Giriş iptal/başarısız: " + err?.message, "warn");
-        log("Auth hata/iptal: " + (err?.message || err));
-      }
-    }
-
-    async function piLogout() {
-      piUser = null;
-      piAccessToken = null;
-      $("#userBox").textContent = "Giriş yapılmadı";
-      $("#loginBtn").style.display = "inline-block";
-      $("#logoutBtn").style.display = "none";
-      setStatus("Oturum kapatıldı.");
-      log("Oturum kapatıldı.");
-    }
-
-    async function onIncompletePaymentFound(payment) {
-      log("Eksik ödeme bulundu: " + payment.identifier);
-      try {
-        const res = await fetch("/api/pi/complete", {
+          body: JSON.stringify({ paymentId })
+        }).catch(()=>{ log("approve fetch çağrısı yapıldı (hata yutuldu)."); });
+      },
+      onReadyForServerCompletion: async (paymentId, txid) => {
+        log("onReadyForServerCompletion: " + paymentId + " txid=" + (txid || "—"));
+        await fetch("/api/pi/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ payment })
-        });
-        const data = await res.json().catch(()=> ({}));
-        log("Eksik ödeme finalize edildi. Sonuç: " + JSON.stringify(data));
-      } catch (e) {
-        log("Eksik ödeme finalize hatası: " + e.message);
+          body: JSON.stringify({ paymentId, txid })
+        }).catch(()=>{ log("complete fetch çağrısı yapıldı (hata yutuldu)."); });
+      },
+      onCancel: (paymentId) => {
+        setStatus("Ödeme iptal edildi: " + paymentId, "warn");
+        log("Ödeme iptal: " + paymentId);
+      },
+      onError: (err, payment) => {
+        setStatus("Ödeme hatası: " + (err?.message || JSON.stringify(err)), "err");
+        log("Ödeme hatası objesi: " + JSON.stringify(err));
+        console.error(err, payment);
       }
-    }
+    });
 
-    async function startPayment() {
-      const product = $("#product").value;
-      const quantity = Number($("#quantity").value);
-      const price = Number($("#price").value);
-      if (!piUser) {
-        setStatus("Önce Pi ile giriş yapın.", "warn");
-        return;
-      }
-      if (!product || !quantity || !price) {
-        setStatus("Ürün/Miktar/Fiyat eksik.", "warn");
-        return;
-      }
-      const amount = Number((quantity * price).toFixed(6));
-      const memo = `AgroPi sipariş: ${product} x ${quantity}kg`;
-      const metadata = { product, quantity, unit_price: price };
+    setStatus("Ödeme oluşturuldu: " + (payment?.identifier || "—"), "ok");
+    log("createPayment başarılı. payment objesi: " + JSON.stringify(payment));
+  } catch (err) {
+    setStatus("Ödeme başlatılamadı: " + ((err && err.message) || err), "err");
+    log("startPayment hata: " + ((err && err.message) || err));
+    console.error(err);
+  }
+}
 
-      setStatus("Ödeme başlatılıyor...", "warn");
-      log(`Ödeme isteği: ${amount} Pi - ${memo}`);
+// UI event bağlamaları
+if ($("#loginBtn")) $("#loginBtn").addEventListener("click", piLogin);
+if ($("#logoutBtn")) $("#logoutBtn"].addEventListener("click", piLogout);
+if ($("#payBtn")) $("#payBtn").addEventListener("click", startPayment);
 
-      try {
-        const Pi = await initPi();
-        const paymentData = { amount, memo, metadata };
-        const payment = await Pi.createPayment(paymentData, {
-          onReadyForServerApproval: async (paymentId) => {
-            log("Server approval bekleniyor: " + paymentId);
-            await fetch("/api/pi/approve", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId })
-            });
-          },
-          onReadyForServerCompletion: async (paymentId, txid) => {
-            log(`Server completion: paymentId=${paymentId} txid=${txid || "—"}`);
-            await fetch("/api/pi/complete", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ paymentId, txid })
-            });
-          },
-          onCancel: (paymentId) => {
-            setStatus("Ödeme iptal edildi: " + paymentId, "warn");
-            log("Ödeme iptal.");
-          },
-          onError: (err, payment) => {
-            setStatus("Ödeme hatası: " + err?.message, "err");
-            log("Ödeme hatası: " + (err?.message || err));
-            console.error(err, payment);
-          },
-        });
+// İlk sepet özeti
+if ($("#cartBox")) $("#cartBox").textContent = summarizeCart();
 
-        setStatus("Ödeme oluşturuldu: " + payment.identifier, "ok");
-        log("Ödeme oluşturuldu: " + payment.identifier);
-      } catch (err) {
-        setStatus("Ödeme başlatılamadı: " + err?.message, "err");
-        log("Ödeme başlatılamadı: " + (err?.message || err));
-      }
-    }
-
-    $("#loginBtn").addEventListener("click", piLogin);
-    $("#logoutBtn").addEventListener("click", piLogout);
-    $("#payBtn").addEventListener("click", startPayment);
-    $("#cartBox").textContent = summarizeCart();
-  </script>
-</body>
-</html>
+// Kullanıcıya öneri: Pi Browser dışında test etme uyarısı
+if (!navigator.userAgent || !/PiBrowser/i.test(navigator.userAgent)) {
+  log("Uyarı: Pi Browser kullanılmıyor olabilir. Gerçek testler için Pi Browser'da açın.");
+  setStatus("Uyarı: Pi Browser'da test etmeniz önerilir.", "warn");
+}
+</script>

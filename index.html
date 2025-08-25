@@ -26,8 +26,10 @@
     .logs{height:260px;overflow:auto;background:#0b1220;color:#dbeafe;padding:12px;border-radius:8px}
     .actions{display:flex;gap:8px}
     .small{font-size:13px;color:#6b7280}
-    .modal { position: fixed; inset: 0; display:flex;align-items:center;justify-content:center; background: rgba(2,6,23,0.5); z-index:999; }
-    .modal .panel{ width: 720px; max-width:95%; background: white; padding: 18px; border-radius:10px; }
+    /* modal styles */
+    .modal { position: fixed; inset: 0; display:flex;align-items:center;justify-content:center; background: rgba(2,6,23,0.5); z-index:999; pointer-events:auto; }
+    .modal.hidden { display:none; }
+    .modal .panel{ width: 720px; max-width:95%; background: white; padding: 18px; border-radius:10px; box-shadow:0 8px 32px rgba(2,6,23,0.35); }
     .text-right{ text-align:right }
   </style>
 </head>
@@ -48,8 +50,8 @@
         <h1>Tarım için basit ödeme ve üyelik</h1>
         <p>AgroPi ile kullanıcılarınızı üye yapın, Pi cüzdanıyla ödeme kabul edin. Test için Pi Browser kullanın. </p>
         <div style="margin-top:14px" class="actions">
-          <button id="ctaMember">Üye Ol / Giriş Yap</button>
-          <button id="ctaPay" class="primary">Ödeme Yap</button>
+          <button id="ctaMember" type="button">Üye Ol / Giriş Yap</button>
+          <button id="ctaPay" class="primary" type="button">Ödeme Yap</button>
         </div>
         <p class="small" style="margin-top:12px">Not: Ödemeleri gerçek test etmek için Pi Browser kullanın. Sandbox = true iken test yapın.</p>
       </div>
@@ -71,8 +73,8 @@
             <label>Şifre</label>
             <input id="mPass" type="password" placeholder="Güçlü bir şifre" />
             <div style="margin-top:10px" class="actions">
-              <button id="mRegister">Üye Ol</button>
-              <button id="mLogin">Giriş Yap</button>
+              <button id="mRegister" type="button">Üye Ol</button>
+              <button id="mLogin" type="button">Giriş Yap</button>
             </div>
             <div id="memberMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
           </div>
@@ -105,13 +107,13 @@
           <input id="note" value="Test siparişi" />
 
           <div style="margin-top:10px" class="actions">
-            <button id="btnLoadSdk">Load SDK</button>
-            <button id="btnInit" class="primary">Init SDK</button>
+            <button id="btnLoadSdk" type="button">Load SDK</button>
+            <button id="btnInit" class="primary" type="button">Init SDK</button>
           </div>
 
           <div style="margin-top:10px" class="actions">
-            <button id="btnLogin">Pi ile Giriş</button>
-            <button id="btnPay">Ödeme Yap</button>
+            <button id="btnLogin" type="button">Pi ile Giriş</button>
+            <button id="btnPay" type="button">Ödeme Yap</button>
           </div>
 
           <div style="margin-top:12px" class="small muted">Logs (test / destek için kopyalayın):</div>
@@ -123,23 +125,25 @@
     </div>
   </main>
 
-  <!-- Basit modal (opsiyonel) -->
-  <div id="modal" class="modal hidden">
-    <div class="panel">
-      <div id="modalContent"></div>
-      <div style="margin-top:12px" class="text-right"><button id="modalClose">Kapat</button></div>
+  <!-- Modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="panel" role="document">
+      <div id="modalContent">
+        <p style="margin:0 0 12px 0">Bu bir demo modalıdır.</p>
+      </div>
+      <div style="margin-top:12px" class="text-right">
+        <button id="modalClose" type="button">Kapat</button>
+      </div>
     </div>
   </div>
 
 <script>
 /* ---------- Basit UI davranışları ---------- */
 const el = (id)=>document.getElementById(id);
-const show = (el)=>el.classList.remove('hidden');
-const hide = (el)=>el.classList.add('hidden');
+const show = (el)=>{ el.classList.remove('hidden'); el.setAttribute('aria-hidden','false'); };
+const hide = (el)=>{ el.classList.add('hidden'); el.setAttribute('aria-hidden','true'); };
 
 el('btnHome').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
-const toggleSection = (id)=>{ const s = el(id); s.style.display = s.style.display === 'none' ? '' : 'none'; };
-
 el('btnShowMember').addEventListener('click', ()=>{ el('memberCard').scrollIntoView({behavior:'smooth'}); });
 el('btnShowPay').addEventListener('click', ()=>{ el('payCard').scrollIntoView({behavior:'smooth'}); });
 
@@ -316,10 +320,59 @@ el('btnPay').addEventListener('click', ()=>{ actionPay(); });
 /* incoming messages from SDK/iframe */
 window.addEventListener('message', (ev)=>{ try{ log('message received from', ev.origin, ev.data); }catch(e){ log('message event işlenemedi:', e); } });
 
-/* modal */
-el('modalClose').addEventListener('click', ()=> hide(el('modal')));
+/* ---------- Robust modal handlers (fix kapatma sorunu) ---------- */
+(function setupModalHandlers(){
+  const modal = el('modal');
+  const panel = modal?.querySelector('.panel');
+
+  // Kapat butonunu kesin bağla (varsa)
+  const closeBtn = el('modalClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hide(modal);
+    }, { passive: true });
+  }
+
+  // Modal arkaplanına (panel dışı) tıklanırsa kapat
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        hide(modal);
+      }
+    }, { passive: true });
+  }
+
+  // Escape tuşu ile kapatma
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modal && !modal.classList.contains('hidden')) {
+        hide(modal);
+      }
+    }
+  });
+
+  // Güvenlik: modal görünürken focus trapping basit (sadece focus'u panel içine çek)
+  // (İleri düzey erişilebilirlik gerekiyorsa aria, focus trap kütüphaneleri eklenebilir)
+  function openModalWithContent(html){
+    el('modalContent').innerHTML = html || '';
+    show(modal);
+    // panel içindeki ilk focusable öğeye odak ver
+    const focusable = panel.querySelector('button, a, input, textarea, select');
+    if (focusable) focusable.focus();
+  }
+
+  // expose helper to global for debug / quick use
+  window.__agropi_openModal = openModalWithContent;
+  window.__agropi_closeModal = ()=> hide(modal);
+})();
 
 /* quick debug console helpers - copy/paste into devtools if needed:
+  // Kapat (instant)
+  document.getElementById('modal')?.classList.add('hidden');
+  // Aç / test
+  __agropi_openModal('<p>Test modal içeriği</p>');
+  // SDK test:
   fetch('https://sdk.minepi.com/pi-sdk.js').then(r=>console.log('sdk fetch status', r.status)).catch(e=>console.log('sdk fetch error', e));
   console.log('window.Pi =', window.Pi);
   console.log('Pi.init?', typeof window.Pi?.init === 'function');

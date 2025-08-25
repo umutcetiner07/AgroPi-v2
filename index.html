@@ -3,182 +3,328 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AgroPi — Payment Test</title>
+  <title>AgroPi — Ana Sayfa</title>
   <style>
-    body { font-family: Inter, system-ui, sans-serif; background:#f6f7fb; color:#111; padding:20px; }
-    .card { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 8px rgba(16,24,40,0.06); max-width:900px; margin:0 auto; }
-    .row{ display:flex; gap:8px; margin-bottom:8px; }
-    input, select, button { padding:10px; border-radius:6px; border:1px solid #d1d5db; font-size:14px; }
-    button { cursor:pointer; background:#e6eef8; border-color:#c6dbf4; }
-    button.primary { background:#2b6ef6; color:#fff; border-color:#2355d1; }
-    pre#logs { height:280px; overflow:auto; background:#0b1220; color:#dbeafe; padding:12px; border-radius:6px; }
-    .muted { color:#6b7280; font-size:13px; margin-top:6px; }
-    label { font-size:13px; color:#374151; }
-    .small { font-size:12px; color:#374151; }
+    :root{--bg:#f5f7fb; --card:#fff; --muted:#6b7280; --accent:#2b6ef6;}
+    body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;background:var(--bg);color:#111}
+    header{background:#fff;border-bottom:1px solid #e6e9ef;padding:14px 20px;display:flex;align-items:center;gap:20px}
+    .container{max-width:1100px;margin:28px auto;padding:0 16px}
+    .logo{font-weight:700;color:var(--accent)}
+    nav{margin-left:auto}
+    nav button{background:transparent;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:600;color:#374151}
+    nav button.primary{background:var(--accent);color:#fff}
+    .hero{background:linear-gradient(180deg,#ffffff 0%, #f8fbff 100%);padding:28px;border-radius:10px;box-shadow:0 6px 18px rgba(16,24,40,0.06);display:flex;gap:24px;align-items:center}
+    .hero h1{margin:0 0 8px 0}
+    .hero p{margin:0;color:var(--muted)}
+    .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 12px rgba(16,24,40,0.04);margin-top:18px}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+    label{display:block;margin-bottom:6px;color:#374151;font-size:13px}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px}
+    button{cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    .hidden{display:none}
+    .logs{height:260px;overflow:auto;background:#0b1220;color:#dbeafe;padding:12px;border-radius:8px}
+    .actions{display:flex;gap:8px}
+    .small{font-size:13px;color:#6b7280}
+    .modal { position: fixed; inset: 0; display:flex;align-items:center;justify-content:center; background: rgba(2,6,23,0.5); z-index:999; }
+    .modal .panel{ width: 720px; max-width:95%; background: white; padding: 18px; border-radius:10px; }
+    .text-right{ text-align:right }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h3>AgroPi — Pi SDK Test Panel</h3>
 
-    <div style="margin-bottom:12px;" class="small">
-      Not: Test için Pi Browser kullanın. sandbox = true iken test yapın; production için sandbox = false yapın ve Pi Support ile allowed origin ekletin.
+  <header>
+    <div class="logo">AgroPi</div>
+    <nav>
+      <button id="btnHome" class="primary">Ana Sayfa</button>
+      <button id="btnShowMember">Üyelik</button>
+      <button id="btnShowPay">Ödeme</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="home" class="hero card">
+      <div style="flex:1">
+        <h1>Tarım için basit ödeme ve üyelik</h1>
+        <p>AgroPi ile kullanıcılarınızı üye yapın, Pi cüzdanıyla ödeme kabul edin. Test için Pi Browser kullanın. </p>
+        <div style="margin-top:14px" class="actions">
+          <button id="ctaMember">Üye Ol / Giriş Yap</button>
+          <button id="ctaPay" class="primary">Ödeme Yap</button>
+        </div>
+        <p class="small" style="margin-top:12px">Not: Ödemeleri gerçek test etmek için Pi Browser kullanın. Sandbox = true iken test yapın.</p>
+      </div>
+      <div style="width:360px">
+        <img src="" alt="" style="width:100%;height:200px;background:#eef3ff;border-radius:8px;display:block;object-fit:cover">
+      </div>
+    </section>
+
+    <div class="grid">
+      <div>
+        <div class="card" id="memberCard">
+          <h3>Üyelik</h3>
+          <div id="memberView">
+            <p class="small">Yeni üyelik oluştur veya giriş yap. (Bu örnek client-side lokal saklama kullanır.)</p>
+            <label>İsim</label>
+            <input id="mName" placeholder="Adınız" />
+            <label>E-posta</label>
+            <input id="mEmail" placeholder="email@ornek.com" />
+            <label>Şifre</label>
+            <input id="mPass" type="password" placeholder="Güçlü bir şifre" />
+            <div style="margin-top:10px" class="actions">
+              <button id="mRegister">Üye Ol</button>
+              <button id="mLogin">Giriş Yap</button>
+            </div>
+            <div id="memberMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h3>Bilgiler</h3>
+          <p class="muted">Buradan üyelik ve ödeme panellerine ulaşabilirsiniz. Ödeme için Pi SDK yüklüyse doğrudan Pi popup çalışacaktır. Aksi halde destek ile iletişime geçin.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="payCard">
+          <h3>Ödeme Paneli</h3>
+
+          <label>App ID</label>
+          <input id="appId" value="agropi-e19dcb997017c03d" />
+
+          <label>Mod</label>
+          <select id="modeSelect">
+            <option value="sandbox" selected>Sandbox</option>
+            <option value="production">Production</option>
+          </select>
+
+          <label>Ürün</label>
+          <input id="product" value="AgroPi Test Ürünü" />
+          <label>Miktar (PI)</label>
+          <input id="amount" value="0.1" />
+          <label>Not (opsiyonel)</label>
+          <input id="note" value="Test siparişi" />
+
+          <div style="margin-top:10px" class="actions">
+            <button id="btnLoadSdk">Load SDK</button>
+            <button id="btnInit" class="primary">Init SDK</button>
+          </div>
+
+          <div style="margin-top:10px" class="actions">
+            <button id="btnLogin">Pi ile Giriş</button>
+            <button id="btnPay">Ödeme Yap</button>
+          </div>
+
+          <div style="margin-top:12px" class="small muted">Logs (test / destek için kopyalayın):</div>
+          <pre id="logs" class="logs"></pre>
+
+          <div class="small text-right" style="margin-top:8px">CONFIG: appId değiştirilebilir. Production için sandbox = false yapın.</div>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <div class="row">
-      <label style="align-self:center;">App ID</label>
-      <input id="appId" style="flex:1" value="agropi-e19dcb997017c03d" />
-      <label style="align-self:center;">Mode</label>
-      <select id="modeSelect">
-        <option value="sandbox">Sandbox</option>
-        <option value="production">Production</option>
-      </select>
-      <label style="align-self:center;">DebugAllowAnyOrigin</label>
-      <input id="dbgAny" type="checkbox" />
+  <!-- Basit modal (opsiyonel) -->
+  <div id="modal" class="modal hidden">
+    <div class="panel">
+      <div id="modalContent"></div>
+      <div style="margin-top:12px" class="text-right"><button id="modalClose">Kapat</button></div>
     </div>
-
-    <div class="row" style="margin-bottom:14px;">
-      <button id="btnLoadSdk">Load SDK</button>
-      <button id="btnInit" class="primary">Init SDK</button>
-      <button id="btnLogin">Pi ile Giriş</button>
-      <button id="btnPay">Ödeme Yap</button>
-      <button id="btnClear">Temizle</button>
-    </div>
-
-    <div class="row" style="margin-bottom:6px;">
-      <label style="align-self:center;">Ürün</label>
-      <input id="product" value="AgroPi Test Ürünü" />
-      <input id="amount" style="width:120px" value="0.1" />
-      <input id="note" style="flex:1" value="Test siparişi" />
-    </div>
-
-    <div class="muted">
-      Logs (kopyalayın / destek için saklayın):
-    </div>
-    <pre id="logs"></pre>
-
-    <div class="muted">Ayrıntı: Bu sayfa SDK yüklenmesini, Pi.init çağrısını ve fallback postMessage akışını kontrol etmek için tasarlandı.</div>
   </div>
 
-  <script>
-    /*************************************************************************
-     * CONFIG - Değiştirilecek ayarlar için (UI'den de kontrol ediliyor)
-     *************************************************************************/
-    const LOG = document.getElementById('logs');
-    function log(...args){
-      const t = new Date().toISOString();
-      const line = `${t} ${args.map(a => {
-        try { return (typeof a === 'string')? a : JSON.stringify(a); } 
-        catch(e){ return String(a); }
-      }).join(' ')}`;
-      LOG.textContent += line + '\n';
-      LOG.scrollTop = LOG.scrollHeight;
-      console.debug(...args);
+<script>
+/* ---------- Basit UI davranışları ---------- */
+const el = (id)=>document.getElementById(id);
+const show = (el)=>el.classList.remove('hidden');
+const hide = (el)=>el.classList.add('hidden');
+
+el('btnHome').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
+const toggleSection = (id)=>{ const s = el(id); s.style.display = s.style.display === 'none' ? '' : 'none'; };
+
+el('btnShowMember').addEventListener('click', ()=>{ el('memberCard').scrollIntoView({behavior:'smooth'}); });
+el('btnShowPay').addEventListener('click', ()=>{ el('payCard').scrollIntoView({behavior:'smooth'}); });
+
+el('ctaMember').addEventListener('click', ()=> el('memberCard').scrollIntoView({behavior:'smooth'}));
+el('ctaPay').addEventListener('click', ()=> el('payCard').scrollIntoView({behavior:'smooth'}));
+
+/* ---------- Minimal membership (client-side demo) ---------- */
+function logMember(msg, color){ const m = el('memberMsg'); m.textContent = msg; m.style.color = color || 'var(--muted)'; }
+const USERS_KEY = 'agropi_demo_users';
+
+function getUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }catch(e){ return {}; } }
+function saveUsers(u){ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+
+el('mRegister').addEventListener('click', ()=>{
+  const name = el('mName').value.trim();
+  const email = el('mEmail').value.trim().toLowerCase();
+  const pass = el('mPass').value;
+  if(!email || !pass){ logMember('E-posta ve şifre gerekli', 'crimson'); return; }
+  const users = getUsers();
+  if(users[email]){ logMember('Bu e-posta zaten kayıtlı', 'crimson'); return; }
+  users[email] = { name, pass };
+  saveUsers(users);
+  logMember('Kayıt başarılı. Giriş yapabilirsiniz.', 'green');
+});
+
+el('mLogin').addEventListener('click', ()=>{
+  const email = el('mEmail').value.trim().toLowerCase();
+  const pass = el('mPass').value;
+  const users = getUsers();
+  if(!users[email] || users[email].pass !== pass){ logMember('Giriş başarısız', 'crimson'); return; }
+  logMember('Giriş başarılı — Hoşgeldiniz, ' + (users[email].name || email), 'green');
+});
+
+/* ---------- Payment / Pi SDK logic (lazy load) ---------- */
+const LOG = el('logs');
+function log(...args){
+  const t = new Date().toISOString();
+  const line = `${t} ${args.map(a => { try{ return (typeof a === 'string')? a : JSON.stringify(a) } catch(e){ return String(a) } }).join(' ')}`;
+  LOG.textContent += line + '\n'; LOG.scrollTop = LOG.scrollHeight; console.log(...args);
+}
+function clearLog(){ LOG.textContent = ''; }
+
+const CONFIG = {
+  appId: el('appId').value || 'agropi-e19dcb997017c03d',
+  sandbox: el('modeSelect').value === 'sandbox',
+  sdkUrl: 'https://sdk.minepi.com/pi-sdk.js',
+  debugAllowAnyOrigin: false
+};
+
+el('appId').addEventListener('change', (e)=>CONFIG.appId = e.target.value);
+el('modeSelect').addEventListener('change', (e)=>CONFIG.sandbox = e.target.value === 'sandbox');
+
+let sdkLoading = false;
+function loadSdkScript(url){
+  if(window._agropi_sdk_loaded) return Promise.resolve(true);
+  if(sdkLoading) return new Promise((res,rej)=>{ const i=setInterval(()=>{ if(window._agropi_sdk_loaded){ clearInterval(i); res(true); } },200); });
+  sdkLoading = true;
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script'); s.src=url; s.async=true;
+    s.onload=()=>{ window._agropi_sdk_loaded = true; sdkLoading = false; log('Pi SDK yüklendi:', url); resolve(true); };
+    s.onerror=(e)=>{ sdkLoading = false; log('Pi SDK yüklenemedi:', url, e); reject(new Error('sdk-load-error')); };
+    document.head.appendChild(s);
+  });
+}
+
+async function tryInitPi(){
+  CONFIG.appId = el('appId').value;
+  CONFIG.sandbox = el('modeSelect').value === 'sandbox';
+  log('initPi() çağrıldı. CONFIG:', CONFIG);
+  if(typeof window.Pi !== 'undefined' && typeof window.Pi.init === 'function'){
+    try{
+      window.Pi.init({ appId: CONFIG.appId, version: '2.0', sandbox: !!CONFIG.sandbox });
+      log('Pi.init çağrıldı (SDK üzerinden).');
+      return true;
+    }catch(err){
+      log('Pi.init hata:', String(err));
+      return false;
     }
-    function clearLog(){ LOG.textContent = ''; }
+  } else {
+    log('Pi.init fonksiyonu bulunamadı. SDK yüklenmemiş veya farklı implementasyon kullanılıyor.');
+    return false;
+  }
+}
 
-    const CONFIG = {
-      appId: document.getElementById('appId').value,
-      sandbox: document.getElementById('modeSelect').value === 'sandbox',
-      debugAllowAnyOrigin: document.getElementById('dbgAny').checked,
-      sdkUrl: 'https://sdk.minepi.com/pi-sdk.js' // doğru SDK URL
-    };
+function sendSDKMessageFallback(type, payload={}){
+  const message = { type, appId: CONFIG.appId, payload };
+  const targetOrigin = CONFIG.sandbox ? 'https://sandbox.minepi.com' : 'https://sdk.minepi.com';
+  try{
+    window.parent.postMessage(message, CONFIG.debugAllowAnyOrigin ? '*' : targetOrigin);
+    log('Fallback postMessage gönderildi ->', targetOrigin, message);
+  }catch(err){
+    log('postMessage hatası:', String(err));
+  }
+}
 
-    // UI -> CONFIG senkron
-    document.getElementById('appId').addEventListener('change', (e)=> CONFIG.appId = e.target.value);
-    document.getElementById('modeSelect').addEventListener('change', (e)=> CONFIG.sandbox = e.target.value === 'sandbox');
-    document.getElementById('dbgAny').addEventListener('change', (e)=> CONFIG.debugAllowAnyOrigin = e.target.checked);
-
-    /*************************************************************************
-     * SDK yükleme ve init
-     *************************************************************************/
-    function loadSdkScript(url){
-      return new Promise((resolve, reject) => {
-        // Eğer daha önce yüklendiyse resolve
-        if (window._agropi_sdk_loaded) { log('SDK daha önce yüklendi'); return resolve(true); }
-
-        const s = document.createElement('script');
-        s.src = url;
-        s.async = true;
-        s.onload = () => {
-          window._agropi_sdk_loaded = true;
-          log('Pi SDK yüklendi:', url);
-          resolve(true);
-        };
-        s.onerror = (e) => {
-          log('Pi SDK yüklenemedi:', url, e);
-          reject(new Error('sdk-load-error'));
-        };
-        document.head.appendChild(s);
-      });
-    }
-
-    async function tryInitPi(){
-      CONFIG.appId = document.getElementById('appId').value;
-      CONFIG.sandbox = document.getElementById('modeSelect').value === 'sandbox';
-      CONFIG.debugAllowAnyOrigin = document.getElementById('dbgAny').checked;
-
-      log('initPi() çağrıldı. CONFIG:', CONFIG);
-      if (typeof window.Pi !== 'undefined' && typeof window.Pi.init === 'function') {
-        try {
-          window.Pi.init({
-            appId: CONFIG.appId,
-            version: '2.0',
-            sandbox: !!CONFIG.sandbox
-          });
-          log('Pi.init çağrıldı (SDK üzerinden).');
-          return true;
-        } catch (err) {
-          log('Pi.init hata:', String(err));
-          return false;
-        }
+async function actionLogin(){
+  log('login butonuna basıldı. Önce initPi çağrılıyor (gerekirse).');
+  let ok = false;
+  try {
+    ok = await tryInitPi();
+  } catch(e){ ok = false; }
+  if(ok && typeof window.Pi !== 'undefined'){
+    try {
+      if(typeof window.Pi.authRequest === 'function'){
+        window.Pi.authRequest({ appId: CONFIG.appId });
+        log('Pi.authRequest çağrıldı (SDK).');
+      } else if(typeof window.Pi.requestAuth === 'function'){
+        window.Pi.requestAuth({ appId: CONFIG.appId });
+        log('Pi.requestAuth çağrıldı (SDK).');
+      } else if(typeof window.Pi.login === 'function'){
+        window.Pi.login();
+        log('Pi.login çağrıldı (SDK).');
       } else {
-        log('Pi.init fonksiyonu bulunamadı. SDK yüklenmemiş veya farklı bir implementasyon kullanılıyor.');
-        return false;
+        log('SDK mevcut fakat auth fonksiyonu bulunamadı — fallback kullanılacak.');
+        sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin });
       }
+    } catch(err){
+      log('SDK üzerinden login denemesi hata:', String(err));
+      sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin });
     }
+  } else {
+    sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin });
+  }
+}
 
-    /*************************************************************************
-     * Fallback: postMessage gönderme (sadece debug/test için)
-     *************************************************************************/
-    function sendSDKMessageFallback(type, payload = {}){
-      const message = { type, appId: CONFIG.appId, payload };
-      // targetOrigin seçiminde sandbox için sandbox host, production için sdk host kullanıyoruz
-      const targetOrigin = CONFIG.sandbox ? 'https://sandbox.minepi.com' : 'https://sdk.minepi.com';
-      try {
-        window.parent.postMessage(message, CONFIG.debugAllowAnyOrigin ? '*' : targetOrigin);
-        log('Fallback postMessage gönderildi ->', targetOrigin, message);
-      } catch (err) {
-        log('postMessage hatası:', String(err));
-      }
-    }
+async function actionPay(){
+  const product = el('product').value;
+  const amount = parseFloat(el('amount').value || '0');
+  const note = el('note').value || '';
+  const payload = { product, amount, note };
+  log('Ödeme butonuna basıldı. Payload:', payload);
 
-    /*************************************************************************
-     * Kullanıcı aksiyonları: login / pay
-     *************************************************************************/
-    async function actionLogin(){
-      log('login butonuna basıldı. Önce initPi çağrılıyor (gerekirse).');
-      const ok = await tryInitPi();
-      // SDK destekliyorsa SDK yöntemiyle, değilse fallback
-      if (ok && typeof window.Pi !== 'undefined') {
-        // SDK method ismi uygulamaya göre değişebilir; çeşitli olasılıkları dene
-        try {
-          if (typeof window.Pi.authRequest === 'function') {
-            window.Pi.authRequest({ appId: CONFIG.appId });
-            log('Pi.authRequest çağrıldı (SDK).');
-          } else if (typeof window.Pi.requestAuth === 'function') {
-            window.Pi.requestAuth({ appId: CONFIG.appId });
-            log('Pi.requestAuth çağrıldı (SDK).');
-          } else if (typeof window.Pi.login === 'function') {
-            window.Pi.login();
-            log('Pi.login çağrıldı (SDK).');
-          } else {
-            log('SDK mevcut fakat bilinen auth fonksiyonu bulunamadı — fallback kullanılacak.');
-            sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin });
-          }
-        } catch (err) {
-          log('SDK üzerinden login denemesi hata:', String(err));
-          sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin });
-        }
+  let ok = false;
+  try { ok = await tryInitPi(); } catch(e){ ok = false; }
+
+  if(ok && typeof window.Pi !== 'undefined'){
+    try{
+      if(typeof window.Pi.requestPay === 'function'){
+        window.Pi.requestPay(payload);
+        log('Pi.requestPay çağrıldı (SDK).');
+      } else if(typeof window.Pi.createPayment === 'function'){
+        window.Pi.createPayment(payload);
+        log('Pi.createPayment çağrıldı (SDK).');
       } else {
-        sendSDKMessageFallback('pi-auth-request', { redirect: window.location.origin
+        log('SDK mevcut fakat pay fonksiyonu bulunamadı — fallback kullanılacak.');
+        sendSDKMessageFallback('pi-pay-request', payload);
+      }
+    }catch(err){
+      log('SDK üzerinden pay hata:', String(err));
+      sendSDKMessageFallback('pi-pay-request', payload);
+    }
+  } else {
+    sendSDKMessageFallback('pi-pay-request', payload);
+  }
+}
+
+/* ---------- Event bindings ---------- */
+el('btnLoadSdk').addEventListener('click', async ()=>{
+  const url = CONFIG.sdkUrl;
+  log('SDK yükleniyor:', url);
+  try{ await loadSdkScript(url); log('SDK yükleme başarılı.'); } catch(err){ log('SDK yükleme başarısız:', String(err)); }
+});
+
+el('btnInit').addEventListener('click', async ()=>{
+  const loaded = (typeof window.Pi !== 'undefined');
+  log('Init tıklaması. window.Pi mevcut mu?', !!loaded);
+  const res = await tryInitPi();
+  log('initPi sonucu:', res);
+});
+
+el('btnLogin').addEventListener('click', ()=>{ actionLogin(); });
+el('btnPay').addEventListener('click', ()=>{ actionPay(); });
+
+/* incoming messages from SDK/iframe */
+window.addEventListener('message', (ev)=>{ try{ log('message received from', ev.origin, ev.data); }catch(e){ log('message event işlenemedi:', e); } });
+
+/* modal */
+el('modalClose').addEventListener('click', ()=> hide(el('modal')));
+
+/* quick debug console helpers - copy/paste into devtools if needed:
+  fetch('https://sdk.minepi.com/pi-sdk.js').then(r=>console.log('sdk fetch status', r.status)).catch(e=>console.log('sdk fetch error', e));
+  console.log('window.Pi =', window.Pi);
+  console.log('Pi.init?', typeof window.Pi?.init === 'function');
+  Array.from(document.scripts).filter(s=>s.src).map(s=>s.src).join('\n')
+*/
+</script>
+</body>
+</html>

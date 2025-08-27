@@ -3,33 +3,76 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AgroPi — Ana Sayfa</title>
+  <title>AgroPi — Tarımda Dijital Çözümler</title>
   <style>
-    :root{--bg:#f5f7fb;--card:#fff;--accent:#2b6ef6;--muted:#6b7280;}
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:#111;}
-    header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1);}
-    .logo{font-weight:700;color:var(--accent);font-size:18px}
-    .hero{max-width:900px;margin:40px auto;padding:40px;background:#fff;border-radius:10px;box-shadow:0 3px 12px rgba(0,0,0,.08);text-align:center}
-    h1{margin:0 0 12px; font-size:28px;}
-    p{color:var(--muted);}
-    .actions{margin-top:20px;display:flex;justify-content:center;gap:14px}
-    .btn{padding:12px 20px;border-radius:6px;border:0;cursor:pointer;font-weight:600}
-    .btn.primary{background:var(--accent);color:#fff}
-    .btn.secondary{background:#e5e7eb;color:#111}
+    :root{--bg:#f9fafb;--card:#fff;--accent:#2b6ef6;--muted:#6b7280;}
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:#111;line-height:1.5}
+    header{padding:16px 32px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between}
+    .logo{font-weight:700;font-size:20px;color:var(--accent)}
+    nav a{margin-left:20px;text-decoration:none;color:#374151;font-weight:500}
+    nav a:hover{color:var(--accent)}
+    .hero{max-width:1000px;margin:60px auto;padding:40px;text-align:center}
+    .hero h1{font-size:36px;margin-bottom:16px}
+    .hero p{font-size:18px;color:var(--muted)}
+    .hero img{margin-top:30px;max-width:100%;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.1)}
+    .features{max-width:1000px;margin:50px auto;display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .feature{background:#fff;padding:24px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);text-align:center}
+    .feature h3{margin:12px 0 6px}
+    .cta{background:#eef2ff;padding:50px 20px;text-align:center}
+    .cta h2{margin-top:0;margin-bottom:16px}
+    .cta button{margin:8px;padding:14px 26px;border:0;border-radius:8px;font-weight:600;cursor:pointer;font-size:16px}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:#e5e7eb;color:#111}
+    footer{margin-top:40px;padding:20px;text-align:center;color:var(--muted);font-size:14px}
   </style>
 </head>
 <body>
+
   <header>
     <div class="logo">AgroPi</div>
+    <nav>
+      <a href="#features">Özellikler</a>
+      <a href="#cta">Üyelik</a>
+    </nav>
   </header>
 
   <section class="hero">
-    <h1>AgroPi ile Tarımda Dijital Ödeme ve Üyelik</h1>
-    <p>Kullanıcılarınızı üye yapın, Pi ağı üzerinden güvenli ödeme alın. Hızlı, kolay ve şeffaf!</p>
-    <div class="actions">
-      <a href="membership.html"><button class="btn secondary">Üyelik</button></a>
-      <a href="payment.html"><button class="btn primary">Ödeme</button></a>
+    <h1>Tarımda Dijital Üyelik ve Ödeme Sistemi</h1>
+    <p>AgroPi, çiftçiler ve tarım toplulukları için kolay üyelik yönetimi ve Pi ağı üzerinden güvenli ödeme çözümleri sunar.</p>
+    <img src="https://via.placeholder.com/900x400?text=AgroPi+Landing+Görseli" alt="AgroPi tanıtım görseli">
+  </section>
+
+  <section class="features" id="features">
+    <div class="feature">
+      <h3>👤 Kolay Üyelik</h3>
+      <p>Kullanıcılarınız saniyeler içinde üye olabilir ve sisteme giriş yapabilir.</p>
+    </div>
+    <div class="feature">
+      <h3>💳 Güvenli Ödeme</h3>
+      <p>Pi ağı ile hızlı, düşük maliyetli ve güvenli ödeme alın.</p>
+    </div>
+    <div class="feature">
+      <h3>📊 Raporlama</h3>
+      <p>Üyelik ve ödeme bilgilerini tek ekranda görüntüleyin, şeffaf yönetin.</p>
+    </div>
+    <div class="feature">
+      <h3>📱 Mobil Uyumlu</h3>
+      <p>AgroPi her cihazda mükemmel çalışır. Telefon, tablet veya bilgisayarda erişebilirsiniz.</p>
     </div>
   </section>
+
+  <section class="cta" id="cta">
+    <h2>Başlamak için hazır mısınız?</h2>
+    <p>Önce ücretsiz üyelikle deneyin, sonra Pro sürüme geçerek ödeme özelliklerini açın!</p>
+    <div>
+      <a href="membership.html"><button class="btn-secondary">Üye Ol</button></a>
+      <a href="payment.html"><button class="btn-primary">Pro Üyelik (Ödeme)</button></a>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 AgroPi — Tarımda Dijital Çözümler
+  </footer>
+
 </body>
 </html>

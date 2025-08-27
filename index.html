@@ -8,7 +8,8 @@
     :root{--bg:#f9fafb;--card:#fff;--accent:#2b6ef6;--muted:#6b7280;}
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:#111;line-height:1.5}
     header{padding:16px 32px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between}
-    .logo{font-weight:700;font-size:20px;color:var(--accent)}
+    .logo img{height:38px;vertical-align:middle;margin-right:10px}
+    .logo span{font-weight:700;font-size:20px;color:var(--accent);vertical-align:middle}
     nav a{margin-left:20px;text-decoration:none;color:#374151;font-weight:500}
     nav a:hover{color:var(--accent)}
     .hero{max-width:1000px;margin:60px auto;padding:40px;text-align:center}
@@ -28,48 +29,56 @@
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
-    <div class="logo">AgroPi</div>
+    <div class="logo">
+      <img src="AgroPi Logo.png" alt="AgroPi Logo">
+      <span>AgroPi</span>
+    </div>
     <nav>
       <a href="#features">Özellikler</a>
       <a href="#cta">Üyelik</a>
     </nav>
   </header>
 
+  <!-- HERO -->
   <section class="hero">
     <h1>Tarımda Dijital Üyelik ve Ödeme Sistemi</h1>
-    <p>AgroPi, çiftçiler ve tarım toplulukları için kolay üyelik yönetimi ve Pi ağı üzerinden güvenli ödeme çözümleri sunar.</p>
+    <p>AgroPi ile çiftçiler, kooperatifler ve tarım toplulukları için üyelik yönetimi ve Pi ağıyla güvenli ödeme çözümleri tek platformda.</p>
     <img src="https://via.placeholder.com/900x400?text=AgroPi+Landing+Görseli" alt="AgroPi tanıtım görseli">
   </section>
 
+  <!-- FEATURES -->
   <section class="features" id="features">
     <div class="feature">
       <h3>👤 Kolay Üyelik</h3>
-      <p>Kullanıcılarınız saniyeler içinde üye olabilir ve sisteme giriş yapabilir.</p>
+      <p>Kullanıcılar saniyeler içinde üye olabilir ve sisteme giriş yapabilir.</p>
     </div>
     <div class="feature">
       <h3>💳 Güvenli Ödeme</h3>
-      <p>Pi ağı ile hızlı, düşük maliyetli ve güvenli ödeme alın.</p>
+      <p>Pi ağı ile hızlı, düşük maliyetli ve şeffaf ödeme alın.</p>
     </div>
     <div class="feature">
       <h3>📊 Raporlama</h3>
-      <p>Üyelik ve ödeme bilgilerini tek ekranda görüntüleyin, şeffaf yönetin.</p>
+      <p>Üyelik ve ödeme bilgilerini tek panelden görüntüleyin.</p>
     </div>
     <div class="feature">
       <h3>📱 Mobil Uyumlu</h3>
-      <p>AgroPi her cihazda mükemmel çalışır. Telefon, tablet veya bilgisayarda erişebilirsiniz.</p>
+      <p>AgroPi her cihazda sorunsuz çalışır: telefon, tablet, bilgisayar.</p>
     </div>
   </section>
 
+  <!-- CTA -->
   <section class="cta" id="cta">
     <h2>Başlamak için hazır mısınız?</h2>
-    <p>Önce ücretsiz üyelikle deneyin, sonra Pro sürüme geçerek ödeme özelliklerini açın!</p>
+    <p>Önce ücretsiz üyelikle deneyin, sonra Pro üyelikle ödeme özelliklerini açın.</p>
     <div>
       <a href="membership.html"><button class="btn-secondary">Üye Ol</button></a>
       <a href="payment.html"><button class="btn-primary">Pro Üyelik (Ödeme)</button></a>
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer>
     © 2025 AgroPi — Tarımda Dijital Çözümler
   </footer>

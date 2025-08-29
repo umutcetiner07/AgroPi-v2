@@ -50,8 +50,10 @@ function initPi(){try{Pi.init({appId:APP_ID,version:"2.0",sandbox:true});log("Pi
 catch(e){log("Pi.init error",e);} }
 
 function doLogin(){try{
-  Pi.authenticate(["username","payments"],auth=>log("Login success",JSON.stringify(auth)),
-  err=>log("Login error",JSON.stringify(err)));
+  Pi.authenticate(["username","payments"],  // ✅ DÜZELTİLDİ
+    auth=>log("Login success",JSON.stringify(auth)),
+    err=>log("Login error",JSON.stringify(err))
+  );
   log("Login requested");}catch(e){log("Login exception",e);} }
 
 function doPay(){try{

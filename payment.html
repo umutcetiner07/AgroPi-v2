@@ -9,7 +9,7 @@
     header{padding:16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1);}
     .container{max-width:600px;margin:30px auto;padding:24px;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
     h2{margin-top:0}
-    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:240px;overflow:auto;font-size:13px}
+    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:260px;overflow:auto;font-size:13px}
     .actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
     button{flex:1;padding:12px;border-radius:6px;border:0;font-weight:600;cursor:pointer;min-width:120px}
     .btn-primary{background:#2b6ef6;color:#fff}
@@ -20,15 +20,16 @@
 <body>
   <header><a href="index.html">← Ana Sayfa</a></header>
   <div class="container">
-    <h2>Pi Test Ödeme (Sandbox)</h2>
-    <input id="product" value="Test Ürün">
+    <h2>Pi Test Ödeme (Sandbox + Mock)</h2>
+    <input id="product" value="AgroPi Test Ürün">
     <input id="amount" value="0.1">
     <input id="note" value="Test siparişi">
     <div class="actions">
       <button id="btnLoad" class="btn-secondary">Load SDK</button>
       <button id="btnInit" class="btn-primary">Init SDK</button>
       <button id="btnLogin" class="btn-secondary">Pi ile Giriş</button>
-      <button id="btnPay" class="btn-primary">Test Ödeme</button>
+      <button id="btnPay" class="btn-primary">Gerçek (SDK) Ödeme</button>
+      <button id="btnMock" class="btn-secondary">Mock (Test) Ödeme</button>
     </div>
     <pre id="logs"></pre>
   </div>
@@ -40,11 +41,11 @@ function log(...a){
   LOG.scrollTop = LOG.scrollHeight;
 }
 
-// App ID (seninkisi test için geçerli)
+// App ID (sandbox için)
 const APP_ID="agropi-e19dcb997017c03d";
 const SDK_URL="https://sdk.minepi.com/pi-sdk.js";
 
-// SDK yükleme
+// SDK load
 function loadSdk(){
   if(window.Pi){ log("SDK zaten yüklü"); return Promise.resolve(); }
   return new Promise((res,rej)=>{
@@ -56,7 +57,7 @@ function loadSdk(){
   });
 }
 
-// Init SDK (sandbox açık!)
+// Init SDK
 function initPi(){
   try{
     Pi.init({ appId:APP_ID, version:"2.0", sandbox:true });
@@ -68,15 +69,15 @@ function initPi(){
 function doLogin(){
   try{
     Pi.authenticate(
-      ["username","payments"],  // scope: username + payments
-      auth => log("Login success",JSON.stringify(auth)),
-      err => log("Login error",JSON.stringify(err))
+      ["username","payments"], 
+      auth => log("Login success", JSON.stringify(auth)),
+      err  => log("Login error", JSON.stringify(err))
     );
     log("Login requested");
   }catch(e){ log("Login exception",e); }
 }
 
-// Testnet Ödeme
+// Real (SDK) Payment
 function doPay(){
   try{
     Pi.createPayment(
@@ -86,19 +87,33 @@ function doPay(){
         metadata: { product: product.value },
         currency: "PI"
       },
-      payment => log("Payment success (SANDBOX)", JSON.stringify(payment)),
-      error   => log("Payment error (SANDBOX)", JSON.stringify(error))
+      payment => log("Payment success (SDK)", JSON.stringify(payment)),
+      error   => log("Payment error (SDK)", JSON.stringify(error))
     );
-    log("Payment requested (SANDBOX)");
-  }catch(e){ log("Payment exception", e); }
+    log("Payment requested (SDK)");
+  }catch(e){ log("Payment exception (SDK)", e); }
 }
 
-// Buton bağlama
+// Mock (Fake) Payment
+function doMock(){
+  log("Mock payment started...");
+  setTimeout(()=>{
+    const fake = {
+      id: "mock-"+Math.floor(Math.random()*10000),
+      product: product.value,
+      amount: amount.value,
+      status: "COMPLETED",
+      txid: "FAKE1234567890"
+    };
+    log("Payment success (MOCK)", JSON.stringify(fake));
+  }, 1000);
+}
+
 btnLoad.onclick = ()=>loadSdk();
 btnInit.onclick = ()=>initPi();
 btnLogin.onclick = ()=>doLogin();
 btnPay.onclick = ()=>doPay();
-
+btnMock.onclick = ()=>doMock();
 </script>
 </body>
 </html>

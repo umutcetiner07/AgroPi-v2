@@ -33,24 +33,16 @@
   </div>
 
 <script>
-const USERS_KEY = "agropi_users";
-function getUsers(){ try{return JSON.parse(localStorage.getItem(USERS_KEY)||"{}");}catch(e){return {}} }
-function saveUsers(u){ localStorage.setItem(USERS_KEY, JSON.stringify(u)) }
-const msgEl=document.getElementById("msg");
-
-document.getElementById("mRegister").onclick = () => {
-  const n=mName.value.trim(),e=mEmail.value.trim().toLowerCase(),p=mPass.value;
-  if(!e||!p){ msgEl.textContent="E-posta ve şifre gerekli";msgEl.style.color="red";return; }
-  const u=getUsers(); if(u[e]){ msgEl.textContent="Zaten kayıtlı";msgEl.style.color="red";return; }
-  u[e]={name:n,pass:btoa(p)}; saveUsers(u);
-  msgEl.textContent="Kayıt başarılı, giriş yapabilirsiniz.";msgEl.style.color="green";
-};
-
-document.getElementById("mLogin").onclick = () => {
-  const e=mEmail.value.trim().toLowerCase(),p=mPass.value;
-  const u=getUsers(); if(!u[e]||u[e].pass!==btoa(p)){ msgEl.textContent="Giriş başarısız";msgEl.style.color="red";return; }
-  msgEl.textContent="Giriş başarılı, hoşgeldin "+(u[e].name||e);msgEl.style.color="green";
-};
+const USERS_KEY="agropi_users"; const msg=document.getElementById("msg");
+function getUsers(){try{return JSON.parse(localStorage.getItem(USERS_KEY)||"{}");}catch(e){return {}}}
+function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u))}
+mRegister.onclick=()=>{const n=mName.value.trim(),e=mEmail.value.trim().toLowerCase(),p=mPass.value;
+ if(!e||!p){msg.textContent="E-posta ve şifre gerekli";msg.style.color="red";return;}
+ const u=getUsers(); if(u[e]){msg.textContent="Zaten kayıtlı";msg.style.color="red";return;}
+ u[e]={name:n,pass:btoa(p)}; saveUsers(u); msg.textContent="Kayıt başarılı";msg.style.color="green";}
+mLogin.onclick=()=>{const e=mEmail.value.trim().toLowerCase(),p=mPass.value; const u=getUsers();
+ if(!u[e]||u[e].pass!==btoa(p)){msg.textContent="Giriş başarısız";msg.style.color="red";return;}
+ msg.textContent="Hoş geldin "+(u[e].name||e);msg.style.color="green";}
 </script>
 </body>
 </html>

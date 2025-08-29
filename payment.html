@@ -3,38 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AgroPi — Ödeme</title>
+  <title>AgroPi — Ödeme Test</title>
   <style>
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:#f6f7fb;color:#111}
     header{padding:16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1);}
-    .container{max-width:600px;margin:40px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
+    .container{max-width:600px;margin:30px auto;padding:24px;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
     h2{margin-top:0}
     label{display:block;margin:10px 0 4px;font-size:14px}
-    input,select{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px}
+    input{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px}
     .actions{margin-top:16px;display:flex;gap:10px}
     button{flex:1;padding:12px;border-radius:6px;border:0;cursor:pointer;font-weight:600}
     .btn-primary{background:#2b6ef6;color:#fff}
     .btn-secondary{background:#e5e7eb;color:#111}
-    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:240px;overflow:auto}
+    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:240px;overflow:auto;font-size:13px}
   </style>
 </head>
 <body>
   <header><a href="index.html">← Ana Sayfa</a></header>
+
   <div class="container">
-    <h2>Ödeme</h2>
-    <label>App ID</label>
-    <input id="appId" value="agropi-e19dcb997017c03d">
-    <label>Mod</label>
-    <select id="modeSelect">
-      <option value="sandbox" selected>Sandbox</option>
-      <option value="production">Production</option>
-    </select>
-    <label>Ürün</label>
-    <input id="product" value="AgroPi Test Ürünü">
-    <label>Miktar (PI)</label>
-    <input id="amount" value="0.1">
-    <label>Not</label>
-    <input id="note" value="Test siparişi">
+    <h2>Ödeme Paneli</h2>
+    <label>Ürün</label><input id="product" value="AgroPi Test Ürünü">
+    <label>Miktar (PI)</label><input id="amount" value="0.1">
+    <label>Not</label><input id="note" value="Test siparişi">
 
     <div class="actions">
       <button id="btnLoad" class="btn-secondary">Load SDK</button>
@@ -49,26 +40,25 @@
 
 <script>
 const LOG=document.getElementById("logs");
-function log(...a){const t=new Date().toISOString();LOG.textContent+=t+" "+a.map(x=>JSON.stringify(x)).join(" ")+"\n";LOG.scrollTop=LOG.scrollHeight;}
+function log(...a){LOG.textContent+=new Date().toISOString()+" "+a.join(" ")+"\n";LOG.scrollTop=LOG.scrollHeight;}
 
-const CONFIG={appId:appId.value,sandbox:true,sdkUrl:"https://sdk.minepi.com/pi-sdk.js"};
-modeSelect.onchange=()=>CONFIG.sandbox=modeSelect.value==="sandbox";
+const APP_ID="agropi-e19dcb997017c03d"; const SDK_URL="https://sdk.minepi.com/pi-sdk.js";
 
-function loadSdk(){
- if(window._sdkLoaded) return Promise.resolve();
- return new Promise((res,rej)=>{
-  const s=document.createElement("script");s.src=CONFIG.sdkUrl;s.onload=()=>{window._sdkLoaded=true;log("SDK loaded");res();};
-  s.onerror=()=>{log("SDK load error");rej();};document.head.appendChild(s);
- });
-}
-async function initPi(){
- try{Pi.init({appId:CONFIG.appId,version:"2.0",sandbox:CONFIG.sandbox});log("Pi.init ok");}
- catch(e){log("Pi.init error",e);}
-}
-btnLoad.onclick=()=>loadSdk();
-btnInit.onclick=()=>initPi();
-btnLogin.onclick=()=>{try{Pi.authenticate(["username"],()=>{});log("Login requested");}catch(e){log("Login error",e)}};
-btnPay.onclick=()=>{try{Pi.createPayment({amount:parseFloat(amount.value),memo:note.value,metadata:{product:product.value},currency:"PI"},()=>{});log("Payment requested");}catch(e){log("Payment error",e)}};
+function loadSdk(){ if(window.Pi){log("SDK zaten yüklü");return Promise.resolve();}
+ return new Promise((res,rej)=>{const s=document.createElement("script");s.src=SDK_URL;
+ s.onload=()=>{log("SDK loaded");res();}; s.onerror=()=>{log("SDK load error");rej();};document.head.appendChild(s);});}
+
+function initPi(){ try{Pi.init({appId:APP_ID,version:"2.0",sandbox:true}); log("Pi.init OK ("+APP_ID+")");}
+ catch(e){log("Pi.init error",e);} }
+
+function doLogin(){ try{Pi.authenticate(["username"],auth=>log("Login success",JSON.stringify(auth)),err=>log("Login error",JSON.stringify(err))); log("Login requested");}
+ catch(e){log("Login exception",e);} }
+
+function doPay(){ try{Pi.createPayment({amount:parseFloat(amount.value),memo:note.value,metadata:{product:product.value},currency:"PI"},
+ pay=>log("Payment success",JSON.stringify(pay)),err=>log("Payment error",JSON.stringify(err))); log("Payment requested");}
+ catch(e){log("Payment exception",e);} }
+
+btnLoad.onclick=()=>loadSdk(); btnInit.onclick=()=>initPi(); btnLogin.onclick=()=>doLogin(); btnPay.onclick=()=>doPay();
 </script>
 </body>
 </html>

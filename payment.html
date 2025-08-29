@@ -3,30 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AgroPi — Ödeme Test</title>
+  <title>AgroPi — Ödeme</title>
   <style>
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:#f6f7fb;color:#111}
     header{padding:16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1);}
     .container{max-width:600px;margin:30px auto;padding:24px;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
     h2{margin-top:0}
-    label{display:block;margin:10px 0 4px;font-size:14px}
-    input{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px}
+    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:240px;overflow:auto;font-size:13px}
     .actions{margin-top:16px;display:flex;gap:10px}
-    button{flex:1;padding:12px;border-radius:6px;border:0;cursor:pointer;font-weight:600}
+    button{flex:1;padding:12px;border-radius:6px;border:0;font-weight:600;cursor:pointer}
     .btn-primary{background:#2b6ef6;color:#fff}
     .btn-secondary{background:#e5e7eb;color:#111}
-    pre{margin-top:20px;padding:12px;background:#0b1220;color:#dbeafe;border-radius:6px;height:240px;overflow:auto;font-size:13px}
+    input{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;margin-bottom:10px}
   </style>
 </head>
 <body>
   <header><a href="index.html">← Ana Sayfa</a></header>
-
   <div class="container">
-    <h2>Ödeme Paneli</h2>
-    <label>Ürün</label><input id="product" value="AgroPi Test Ürünü">
-    <label>Miktar (PI)</label><input id="amount" value="0.1">
-    <label>Not</label><input id="note" value="Test siparişi">
-
+    <h2>Ödeme Testi</h2>
+    <input id="product" value="AgroPi Test Ürünü">
+    <input id="amount" value="0.1">
+    <input id="note" value="Test siparişi">
     <div class="actions">
       <button id="btnLoad" class="btn-secondary">Load SDK</button>
       <button id="btnInit" class="btn-primary">Init SDK</button>
@@ -42,23 +39,28 @@
 const LOG=document.getElementById("logs");
 function log(...a){LOG.textContent+=new Date().toISOString()+" "+a.join(" ")+"\n";LOG.scrollTop=LOG.scrollHeight;}
 
-const APP_ID="agropi-e19dcb997017c03d"; const SDK_URL="https://sdk.minepi.com/pi-sdk.js";
+const APP_ID="agropi-e19dcb997017c03d"; 
+const SDK_URL="https://sdk.minepi.com/pi-sdk.js";
 
 function loadSdk(){ if(window.Pi){log("SDK zaten yüklü");return Promise.resolve();}
  return new Promise((res,rej)=>{const s=document.createElement("script");s.src=SDK_URL;
- s.onload=()=>{log("SDK loaded");res();}; s.onerror=()=>{log("SDK load error");rej();};document.head.appendChild(s);});}
+ s.onload=()=>{log("SDK loaded");res();};s.onerror=()=>{log("SDK load error");rej();};document.head.appendChild(s);});}
 
-function initPi(){ try{Pi.init({appId:APP_ID,version:"2.0",sandbox:true}); log("Pi.init OK ("+APP_ID+")");}
- catch(e){log("Pi.init error",e);} }
+function initPi(){try{Pi.init({appId:APP_ID,version:"2.0",sandbox:true});log("Pi.init OK ("+APP_ID+")");}
+catch(e){log("Pi.init error",e);} }
 
-function doLogin(){ try{Pi.authenticate(["username"],auth=>log("Login success",JSON.stringify(auth)),err=>log("Login error",JSON.stringify(err))); log("Login requested");}
- catch(e){log("Login exception",e);} }
+function doLogin(){try{
+  Pi.authenticate(["username","payments"],auth=>log("Login success",JSON.stringify(auth)),
+  err=>log("Login error",JSON.stringify(err)));
+  log("Login requested");}catch(e){log("Login exception",e);} }
 
-function doPay(){ try{Pi.createPayment({amount:parseFloat(amount.value),memo:note.value,metadata:{product:product.value},currency:"PI"},
- pay=>log("Payment success",JSON.stringify(pay)),err=>log("Payment error",JSON.stringify(err))); log("Payment requested");}
- catch(e){log("Payment exception",e);} }
+function doPay(){try{
+  Pi.createPayment({amount:parseFloat(amount.value),memo:note.value,metadata:{product:product.value},currency:"PI"},
+  pay=>log("Payment success",JSON.stringify(pay)),
+  err=>log("Payment error",JSON.stringify(err)));
+  log("Payment requested");}catch(e){log("Payment exception",e);} }
 
-btnLoad.onclick=()=>loadSdk(); btnInit.onclick=()=>initPi(); btnLogin.onclick=()=>doLogin(); btnPay.onclick=()=>doPay();
+btnLoad.onclick=()=>loadSdk();btnInit.onclick=()=>initPi();btnLogin.onclick=()=>doLogin();btnPay.onclick=()=>doPay();
 </script>
 </body>
 </html>
